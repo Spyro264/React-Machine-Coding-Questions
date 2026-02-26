@@ -1,10 +1,11 @@
-import React from 'react'
+
 import Vscodesidebar from './components/Vscodesidebar'
+import { mockData } from './utils/mock'
 
 const App = () => {
   return (
     <div>
-      <Vscodesidebar />
+      <Vscodesidebar data={mockData}/>
     </div>
   )
 }

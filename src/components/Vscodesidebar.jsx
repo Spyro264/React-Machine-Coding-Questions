@@ -1,54 +1,59 @@
-import React, { useState } from "react"
-import { mockData } from "../utils/mock"
+import React, { useEffect , useState } from 'react'
 
-const Vscodesidebar = () => {
+const Vscodesidebar = ({data}) => {
 
-    const [Folder, setFolder] = useState([]);
-    const [File, setFile] = useState([]);
+const [apidata , setApiData] = useState();
+const [open , setOpen] = useState(false);
 
-    // destructuring
-    const {items=[]} = mockData || {};
+ const addFile = () =>{   
+   setApiData({
+    ...apidata,
+    items:[
+        ...apidata.items,
+        {id:Date.now() , name:`File${Math.random().toFixed(2)}`, isFolder:false}
+    ]
+   })
+  }
 
-    // filtering only folders
-    const folders = items?.filter(item => item.isFolder);
-  
-    //filtering only files
-    const files = items?.filter(item => !item.isFolder);
+const addFolder = () =>{
+    setApiData({
+        ...apidata,
+        items:[
+            ...apidata.items,
+            {id:Date.now() , name:`Folder${ Math.random().toFixed(2)}`, isFolder:true , items:[]}
+        ]
+    })
+  }
+
+useEffect(()=>{
+ setApiData(data) 
+ },[data])
+
     
-    const handleClick = (e) =>{
-        const folderName = e.target.innerText;
-        const fol = folders.filter(folder => folder.name === folderName) ;
-        const {items} = fol[0] || {}
-        console.log({items});
-        
-        items.forEach((item=>{
-            if(item.isFolder){
-                setFolder(prev => [...prev, item]);
-            }else{
-                setFile(prev => [...prev, item]);
-            }
-        }))
-        
-    }
 
   return (
     <div>
         <div>
-            {folders.map((folder)=>(
-                <div key={folder.id} style={{border:"1px solid black" , width:"fit-content" , padding:"3px" , backgroundColor:"#fed250", color:"black"}} onClick={handleClick}>{folder.name}</div>
-            ))}
-              {Folder?.length > 0 && Folder.map((fol)=>(
-                    <div key={fol.id} style={{border:"1px solid black" , width:"fit-content" , padding:"3px" , backgroundColor:"#fed250", color:"black", marginLeft:"20px"}}>{fol.name}</div>   
-                ))}
-
-               
+            {/* root button */}
+            <div style={{display:"flex" , gap:10 , alignItems:"center"}}>
+                <h3 onClick={()=>setOpen((prev)=> !prev)}>{`🗂️ ${apidata?.name}`}</h3>
+                <div style={{display:"flex" ,gap:4}}>
+                    <button onClick={addFile}>file</button>
+                    <button onClick={addFolder}>folder</button>
+                </div>
+            </div>
             
-        </div>
 
-        <div>
-            {files.map((file)=>(
-                <div key={file.id} style={{border:"1px solid black" , width:"fit-content" , padding:"3px" , backgroundColor:"#dcdcdc", color:"black"}}>{file.name}</div>    
-            ))}
+            <div style={{marginLeft:"20px" , display: open ? "block" : "none"}}>
+                {apidata?.items?.map((item)=>{    
+                    if(item.isFolder){
+                        return <Vscodesidebar key={item.id} data={item}/>
+                    }else{
+                        return <h4 key={item.id}>{`📄 ${item.name}`}</h4>
+                    }
+                })}
+            </div>
+
         </div>
     </div>
   )
